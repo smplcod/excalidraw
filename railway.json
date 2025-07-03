@@ -4,6 +4,6 @@
     "buildCommand": "cd excalidraw-app && yarn install --frozen-lockfile && yarn build"
   },
   "deploy": {
-    "startCommand": "npx serve -s excalidraw-app/dist -l 8080"
+    "startCommand": "npx serve -s excalidraw-app/build -l 8080"
   }
 }
