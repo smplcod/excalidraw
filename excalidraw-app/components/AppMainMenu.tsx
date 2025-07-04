@@ -2,6 +2,8 @@ import {
   loginIcon,
   ExcalLogo,
   eyeIcon,
+  save,
+  LoadIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { MainMenu } from "@excalidraw/excalidraw/index";
 import React from "react";
@@ -22,6 +24,8 @@ export const AppMainMenu: React.FC<{
   theme: Theme | "system";
   setTheme: (theme: Theme | "system") => void;
   refresh: () => void;
+  onSaveToDatabase: () => void;
+  onOpenFromDatabase: () => void;
 }> = React.memo((props) => {
   return (
     <MainMenu>
@@ -29,6 +33,12 @@ export const AppMainMenu: React.FC<{
       <MainMenu.DefaultItems.SaveToActiveFile />
       <MainMenu.DefaultItems.Export />
       <MainMenu.DefaultItems.SaveAsImage />
+      <MainMenu.Item icon={save} onSelect={props.onSaveToDatabase}>
+        Save to database
+      </MainMenu.Item>
+      <MainMenu.Item icon={LoadIcon} onSelect={props.onOpenFromDatabase}>
+        Open from database
+      </MainMenu.Item>
       {props.isCollabEnabled && (
         <MainMenu.DefaultItems.LiveCollaborationTrigger
           isCollaborating={props.isCollaborating}

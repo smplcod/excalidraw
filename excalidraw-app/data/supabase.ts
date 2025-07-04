@@ -1,4 +1,5 @@
 import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
+
 import type { ImportedDataState } from "@excalidraw/excalidraw/data/types";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
@@ -16,15 +17,21 @@ export const saveToSupabase = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
   files: BinaryFiles,
+  name?: string,
 ): Promise<{ id: string }> => {
   const payload = JSON.parse(
     serializeAsJSON(elements, appState, files, "database"),
   );
 
+  const body: Record<string, any> = { data: payload };
+  if (name) {
+    body.name = name;
+  }
+
   const response = await fetch(`${SUPABASE_URL}/rest/v1/drawings`, {
     method: "POST",
     headers: { ...baseHeaders, Prefer: "return=representation" },
-    body: JSON.stringify({ data: payload }),
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
@@ -53,3 +60,20 @@ export const loadFromSupabase = async (
   return (json[0]?.data as ImportedDataState) || {};
 };
 
+export const listSupabaseDrawings = async (): Promise<
+  {
+    id: string;
+    name: string | null;
+  }[]
+> => {
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/drawings?select=id,name`,
+    { headers: baseHeaders },
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to list drawings");
+  }
+
+  return (await response.json()) as { id: string; name: string | null }[];
+};

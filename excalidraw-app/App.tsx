@@ -101,6 +101,11 @@ import {
   exportToExcalidrawPlus,
 } from "./components/ExportToExcalidrawPlus";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
+import {
+  saveToSupabase,
+  loadFromSupabase,
+  listSupabaseDrawings,
+} from "./data/supabase";
 
 import {
   exportToBackend,
@@ -719,6 +724,50 @@ const ExcalidrawWrapper = () => {
     }
   };
 
+  const onSaveToDatabase = async () => {
+    if (!excalidrawAPI) {
+      return;
+    }
+    const name = window.prompt("Enter canvas name");
+    if (!name) {
+      return;
+    }
+    try {
+      const { id } = await saveToSupabase(
+        excalidrawAPI.getSceneElements(),
+        excalidrawAPI.getAppState(),
+        excalidrawAPI.getFiles(),
+        name,
+      );
+      window.alert(`Saved with id ${id}`);
+    } catch (error: any) {
+      setErrorMessage(error.message);
+    }
+  };
+
+  const onOpenFromDatabase = async () => {
+    if (!excalidrawAPI) {
+      return;
+    }
+    try {
+      const drawings = await listSupabaseDrawings();
+      const choice = window.prompt(
+        `Select drawing:\n${drawings
+          .map((d, i) => `${i + 1}. ${d.name ?? d.id}`)
+          .join("\n")}`,
+      );
+      const index = Number(choice) - 1;
+      const selected = drawings[index];
+      if (!selected) {
+        return;
+      }
+      const data = await loadFromSupabase(selected.id);
+      excalidrawAPI.updateScene(data);
+    } catch (error: any) {
+      setErrorMessage(error.message);
+    }
+  };
+
   const renderCustomStats = (
     elements: readonly NonDeletedExcalidrawElement[],
     appState: UIAppState,
@@ -878,6 +927,8 @@ const ExcalidrawWrapper = () => {
           theme={appTheme}
           setTheme={(theme) => setAppTheme(theme)}
           refresh={() => forceRefresh((prev) => !prev)}
+          onSaveToDatabase={onSaveToDatabase}
+          onOpenFromDatabase={onOpenFromDatabase}
         />
         <AppWelcomeScreen
           onCollabDialogOpen={onCollabDialogOpen}
