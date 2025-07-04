@@ -1,0 +1,16 @@
+---
+slug: /@excalidraw/excalidraw/api/supabase
+---
+
+# Supabase integration
+
+The application exposes helpers to save and load scenes using a [Supabase](https://supabase.com/) backend.
+
+```ts
+import { saveToSupabase, loadFromSupabase } from "excalidraw-app/data/supabase";
+```
+
+`saveToSupabase()` returns the created row `id` which you can later use with `loadFromSupabase()` to retrieve the scene.
+
+The helpers expect the environment variables `VITE_APP_SUPABASE_URL` and `VITE_APP_SUPABASE_ANON_KEY` to be defined.
+
